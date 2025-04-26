@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events'
 import { signTx, signMessage } from './signer.js'
 import { rpcRequest } from './utils/rpc.js'
+// import { AuthContext } from '../contexts/AuthContext';
 
 export default class MyWalletProvider extends EventEmitter {
   constructor(chainIdHex = '0x7A69') {
@@ -16,8 +17,9 @@ export default class MyWalletProvider extends EventEmitter {
         return this.chainId
       case 'eth_accounts':
         return [await this._getAddress()]
-      case 'eth_sendTransaction':
-        return this._sendTx(params?.[0])
+      case 'eth_sendTransaction': {   
+        console.log("param", params);
+        return this._sendTx(params) }
       case 'personal_sign':
       case 'eth_signTypedData_v4':
         return this._signMsg(method, params)
@@ -28,21 +30,28 @@ export default class MyWalletProvider extends EventEmitter {
 
   // -------- helpers --------
   async _getAddress() {
-    // const addr = localStorage.getItem('mywallet:addr')
-    const addr = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+    console.log("aa");
+    const addr = localStorage.getItem('mywallet:addr')
+    // const addr = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
     if (!addr) throw new Error('NOT_CONNECTED')
     return addr
   }
 
   async _sendTx(tx) {
-    const { txHash } = await signTx(tx)
+    // console.log("tx", tx);
+    const token = localStorage.getItem('authToken');
+    const walletId = localStorage.getItem('mywallet:wid');
+    // alert(walletId);
+    console.log("a");
+    const { txHash } = await signTx(token, walletId, tx)
     this.emit('txSent', txHash)
     return txHash
   }
 
   async _signMsg(method, params) {
+    const token = localStorage.getItem('authToken');
     const [msg, addr] = method === 'personal_sign' ? params : [params[1], params[0]]
-    return signMessage({ address: addr, message: msg })
+    return signMessage(token, { address: addr, message: msg })
   }
 }
 

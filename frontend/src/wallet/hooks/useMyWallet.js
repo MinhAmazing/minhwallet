@@ -10,16 +10,10 @@ export default function useMyWallet() {
     if (!window.myWallet) throw new Error('Provider not found')
     console.log(window.myWallet);
     const eth = new BrowserProvider(window.myWallet)   // ethers v6 :contentReference[oaicite:1]{index=1}
-    console.log(eth);
     const signer = await eth.getSigner()
-    console.log(eth);
     setProvider(eth)
-    console.log("1");
-
     setAddress(await signer.getAddress())
-    console.log("2");
     setChainId((await eth.getNetwork()).chainId)
-    console.log("3");
   }, [])
 
   useEffect(() => {

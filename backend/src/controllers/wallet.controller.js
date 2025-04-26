@@ -5,6 +5,9 @@ const { ethers } = require('ethers');
 const WalletModel = require('../models/wallet.model');
 const { encrypt, decrypt } = require('../utils/encrypt');
 
+const providerUrl = "https://hardhat.imminh.com/";
+const toAddress = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
+
 exports.createWallet = async (req, res) => {
   try {
     const userId = req.user._id; // Lấy từ middleware JWT
@@ -85,7 +88,8 @@ exports.getWallets = async (req, res) => {
 exports.signData = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { walletId, dataToSign } = req.body;
+    const { walletId, tx } = req.body;
+    const {to, value} = tx;
 
     const walletDoc = await WalletModel.findOne({ _id: walletId, userId });
     if (!walletDoc) {
@@ -93,13 +97,44 @@ exports.signData = async (req, res) => {
     }
 
     const decryptedKey = decrypt(walletDoc.privateKeyEncrypted);
-    const userWallet = new ethers.Wallet(decryptedKey);
+    console.log("DE", decryptedKey);
+    // const userWallet = new ethers.Wallet(decryptedKey);
 
     // Ký message
-    const signature = await userWallet.signMessage(ethers.utils.arrayify(dataToSign));
+    // const signature = await userWallet.signMessage(ethers.utils.arrayify(dataToSign));
 
-    return res.json({ signature });
+    // return res.json({ signature });
+
+    // try {
+    const provider = new ethers.providers.JsonRpcProvider(providerUrl);
+
+    // Create a wallet instance
+    const wallet = new ethers.Wallet(decryptedKey, provider);
+
+    // Convert the amount to wei
+    const amountInWei = ethers.utils.parseEther(value);
+
+    // Create a transaction object
+    const txToSign = {
+      to: to,
+      value: amountInWei,
+      gasLimit: 21001
+    };
+
+    // Send the transaction
+    const transaction = await wallet.sendTransaction(txToSign);
+    
+    console.log("Transaction sent:", transaction.hash);
+
+    // Wait for the transaction to be mined
+    await transaction.wait();
+    // } catch (err) {
+    //   console.log("err", err);
+    //     }
+    console.log("Transaction confirmed.");
+    return res.json({ "signature": transaction.hash });
   } catch (error) {
+    console.log("error", error)
     return res.status(500).json({ error: error.message });
   }
 };
