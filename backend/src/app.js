@@ -13,6 +13,7 @@ const walletRoutes = require('./routes/wallet.routes');
 connectDB();
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
@@ -28,7 +29,3 @@ app.get('/', (req, res) => {
 });
 
 module.exports = app;
-// minhpham@192 bl % cd ntf-marketplace-backend-api
-// cd: no such file or directory: ntf-marketplace-backend-api
-// minhpham@192 bl % cd nft-marketplace-backend-api
-// minhpham@192 nft-marketplace-backend-api %
