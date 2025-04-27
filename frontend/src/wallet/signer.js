@@ -8,7 +8,6 @@ export async function signTx(token, walletId, payload) {
     const res = await fetch('http://localhost:4000/wallet/sign', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' , Authorization: `Bearer ${token}`},
-      credentials: 'include',
       body: JSON.stringify({walletId, tx: payload})
     })
   
@@ -25,7 +24,6 @@ export async function signTx(token, walletId, payload) {
     const res = await fetch('http://localhost:4000/wallet/sign', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      credentials: 'include',
       body: JSON.stringify({ type: 'message', address, message })
     })
     if (!res.ok) throw new Error(`SIGN_FAILED ${res.status}`)

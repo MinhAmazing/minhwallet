@@ -7,8 +7,8 @@ function Balance() {
   const { provider, address } = useMyWallet()
 
   const [balance, setBalance] = useState(null)
-  const [receiver, setReceiver] = useState('0x70997970C51812dc3A010C7d01b50e0d17dc79C8')  // Địa chỉ ví người nhận
-  const [amount, setAmount] = useState('1')      // Số lượng ETH người dùng muốn gửi
+  const [receiver, setReceiver] = useState('')  // Địa chỉ ví người nhận
+  const [amount, setAmount] = useState('')      // Số lượng ETH người dùng muốn gửi
   const [sending, setSending] = useState(false) // Trạng thái gửi giao dịch
 
   // Lấy số dư tài khoản
@@ -115,7 +115,7 @@ function Balance() {
             {sending ? 'Sending...' : 'Send ETH'}
           </button>
           <br/>
-          <button onClick={signMessage}>Sign Message</button>
+          {/* <button onClick={signMessage}>Sign Message</button> */}
         </>
       )}
     </div>
